@@ -705,6 +705,63 @@ async function GetVersion(): Promise<PCVersion> {
   }
 }
 
+function GetPCUIVersions(callback?: Callback) {
+  var url = `manager/get_pcui_versions`
+  request('get', url)
+    .then((response: any) => {
+      if (response.status === 200) {
+        console.log('pcui_versions', response.data)
+        callback && callback(response.data)
+        setState(['app', 'pcui_versions'], response.data)
+      }
+    })
+    .catch((error: any) => {
+      if (error.response) {
+        console.log(error.response)
+        notify(`Error: ${error.response.data.message}`, 'error')
+      }
+      console.log(error)
+    })
+}
+
+function GetStackInfo(callback?: Callback) {
+  var url = `manager/get_stack_info`
+  request('get', url)
+    .then((response: any) => {
+      if (response.status === 200) {
+        console.log('stack_info', response.data)
+        callback && callback(response.data.stack_info)
+        setState(['app', 'stack_info'], response.data.stack_info)
+      }
+    })
+    .catch((error: any) => {
+      if (error.response) {
+        console.log(error.response)
+        notify(`Error: ${error.response.data.message}`, 'error')
+      }
+      console.log(error)
+    })
+}
+
+function SetPCUIVersion(version: string, callback?: Callback) {
+  var url = `manager/set_pcui_version?version=${version}`
+  console.log(url)
+  request('post', url)
+    .then((response: any) => {
+      if (response.status === 200) {
+        console.log('set_pcui_version', response.data)
+      }
+      callback && callback(response.data)
+    })
+    .catch((error: any) => {
+      if (error.response) {
+        console.log(error.response)
+        notify(`Error: ${error.response.data.message}`, 'error')
+      }
+      console.log(error)
+    })
+}
+
 function Ec2Action(instanceId: any, action: any, callback?: Callback) {
   let url = `manager/ec2_action?instance_id=${instanceId}&action=${action}`
 
@@ -923,6 +980,8 @@ async function LoadInitialState() {
   ListCustomImages()
   ListOfficialImages()
   LoadAwsConfig(region)
+  GetPCUIVersions()
+  GetStackInfo()
 }
 
 export {
@@ -947,6 +1006,9 @@ export {
   ListOfficialImages,
   LoadInitialState,
   Ec2Action,
+  GetPCUIVersions,
+  SetPCUIVersion,
+  GetStackInfo,
   LoadAwsConfig,
   GetDcvSession,
   QueueStatus,

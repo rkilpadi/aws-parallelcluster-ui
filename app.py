@@ -32,6 +32,8 @@ from api.PclusterApiHandler import (
     get_dcv_session,
     get_identity,
     get_instance_types,
+    get_pcui_versions,
+    get_stack_info,
     get_version,
     list_users,
     login,
@@ -41,6 +43,7 @@ from api.PclusterApiHandler import (
     queue_status,
     sacct,
     scontrol_job,
+    set_pcui_version,
 )
 from api.costmonitoring import costs
 from api.pcm_globals import logger
@@ -63,6 +66,7 @@ from api.validation.schemas import (
     QueueStatus,
     Sacct,
     ScontrolJob,
+    SetPCUIVersion,
 )
 
 ADMINS_GROUP = { "admin" }
@@ -150,6 +154,20 @@ def run():
     @app.route("/manager/get_version")
     def get_version_():
         return get_version()
+
+    @app.route("/manager/get_stack_info")
+    def get_stack_info_():
+        return get_stack_info()
+
+    @app.route("/manager/get_pcui_versions")
+    def get_pcui_versions_():
+        return get_pcui_versions()
+
+    @app.route("/manager/set_pcui_version", methods=["POST"])
+    @authenticated(ADMINS_GROUP)
+    @validated(params=SetPCUIVersion)
+    def set_pcui_version_():
+        return set_pcui_version()
 
     @app.route("/manager/get_app_config")
     def get_app_config_():
